@@ -20,6 +20,25 @@ cimport cython
 from .image_samplers cimport ImageSampler
 from .volume_container cimport VolumeContainer, vc_index, vc_pos_index
 
+#-----------------------------------------------------------------------------
+# sampler_function(VolumeContainer *vc, np.float64_t v_pos[3], np.float64_t v_dir[3], np.float64_t enter_t,
+#                   np.float64_t exit_t, int index[3], void* data)
+#    vc        VolumeContainer*  : Pointer to the volume container to be traversed.
+#    v_pos     np.float64_t[3]   : The x,y,z coordinates of the ray's origin.
+#    v_dir     np.float64_t[3]   : The x,y,z coordinates of the ray's direction.
+#    enter_t   np.float64_t      : The 't' that represents the point of intersection into the volume container 'vc'.
+#    exit_t    np.float64_t      : The 't' until it exits from the volume container 'vc'.
+#    index     int[3]            : The current index of the cell that the ray is currently located in.
+#    data      void*             : The accumulated data of sampling.
+#
+#    Note: 't' is not time here. Rather, it is a factor representing the difference between the initial point 'v_pos'
+#             and the end point, which we might call v_end. It is scaled such that v_pos + v * t = v_pos at t = 0.0, and 
+#             v_end at t = 1.0. Therefore, if max_t is set to 1.0, there is no restriction on t.
+#
+# Written by the yt Development Team.
+# Used to sample a ray within the volume container 'vc' at a given index. Any data accumulated will be
+# passed to 'data'.
+#-----------------------------------------------------------------------------
 ctypedef void sampler_function(
                 VolumeContainer *vc,
                 np.float64_t v_pos[3],
