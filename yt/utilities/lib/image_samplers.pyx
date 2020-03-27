@@ -24,7 +24,8 @@ from field_interpolation_tables cimport \
     FieldInterpolationTable, FIT_initialize_table, FIT_eval_transfer,\
     FIT_eval_transfer_with_light
 cimport lenses
-from .grid_traversal cimport walk_volume
+from .grid_traversal cimport \
+    walk_volume_cartesian, walk_volume_spherical
 from .fixed_interpolator cimport \
     offset_interpolate, \
     fast_interpolate, \
@@ -68,6 +69,12 @@ cdef class ImageSampler:
                   np.ndarray[np.float64_t, ndim=1] width,
                   *args, **kwargs):
         cdef int i
+
+        geometry = kwargs.pop("geometry", "cartesian")
+        if geometry == "cartesian":
+            self.walk_volume = walk_volume_cartesian
+        elif geometry == "spherical":
+            self.walk_volume = walk_volume_spherical
 
         camera_data = kwargs.pop("camera_data", None)
         if camera_data is not None:
@@ -170,7 +177,7 @@ cdef class ImageSampler:
                 for i in range(Nch):
                     idata.rgba[i] = self.image[vi, vj, i]
                 max_t = fclip(self.zbuffer[vi, vj], 0.0, 1.0)
-                walk_volume(vc, v_pos, v_dir, self.sample,
+                self.walk_volume(vc, v_pos, v_dir, self.sample,
                             (<void *> idata), NULL, max_t)
                 if (j % (10*chunksize)) == 0:
                     with gil:

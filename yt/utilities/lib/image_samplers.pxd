@@ -35,6 +35,14 @@ ctypedef void generate_vector_info_function(ImageSampler im,
             np.float64_t width[2],
             np.float64_t v_dir[3], np.float64_t v_pos[3]) nogil
 
+ctypedef int walk_volume_function(VolumeContainer *vc,
+                     np.float64_t v_pos[3],
+                     np.float64_t v_dir[3],
+                     sampler_function *sample,
+                     void *data,
+                     np.float64_t *return_t = NULL,
+                     np.float64_t max_t = 1.0) nogil
+
 cdef struct ImageAccumulator:
     np.float64_t rgba[Nch]
     void *supp_data
@@ -63,6 +71,7 @@ cdef class ImageSampler:
     cdef calculate_extent_function *extent_function
     cdef generate_vector_info_function *vector_function
     cdef void setup(self, PartitionedGrid pg)
+    cdef walk_volume_function walk_volume
     @staticmethod
     cdef void sample(VolumeContainer *vc,
                 np.float64_t v_pos[3],

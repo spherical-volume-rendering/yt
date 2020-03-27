@@ -37,6 +37,7 @@ def new_mesh_sampler(camera, render_source, engine):
         params['width'],
     )
     kwargs = {'lens_type': params['lens_type']}
+    kwargs['geometry'] = render_source.ds.geometry
     if engine == 'embree':
         sampler = mesh_traversal.EmbreeMeshSampler(*args, **kwargs)
     elif engine == 'yt':
@@ -71,6 +72,7 @@ def new_volume_render_sampler(camera, render_source):
     else:
         kwargs['zbuffer'] = np.ones(params['image'].shape[:2], "float64")
 
+    kwargs['geometry'] = render_source.ds.geometry
     sampler = VolumeRenderSampler(*args, **kwargs)
     return sampler
 
@@ -95,6 +97,7 @@ def new_interpolated_projection_sampler(camera, render_source):
         kwargs['zbuffer'] = render_source.zbuffer.z
     else:
         kwargs['zbuffer'] = np.ones(params['image'].shape[:2], "float64")
+    kwargs['geometry'] = render_source.ds.geometry
     sampler = InterpolatedProjectionSampler(*args, **kwargs)
     return sampler
 
@@ -119,6 +122,7 @@ def new_projection_sampler(camera, render_source):
         kwargs['zbuffer'] = render_source.zbuffer.z
     else:
         kwargs['zbuffer'] = np.ones(params['image'].shape[:2], "float64")
+    kwargs['geometry'] = render_source.ds.geometry
     sampler = ProjectionSampler(*args, **kwargs)
     return sampler
 
